@@ -101,6 +101,8 @@
 import '~/assets/css/hospital_personal.css'
 import '~/assets/css/hospital.css'
 import hospitalApi from '@/api/yygh/hospital'
+import cookie from "js-cookie";
+import userInfoApi from '@/api/yygh/userinfo'
 
 export default {
   data() {
@@ -129,7 +131,25 @@ export default {
       })
     },
     schedule(depcode) {
-      window.location.href = '/hospital/schedule?hoscode=' + this.hoscode + "&depcode=" + depcode
+      //1、登录判断
+      let token = cookie.get('token')
+      if (!token) {
+        //token不存在，说明未登录，打开登录弹出窗
+        loginEvent.$emit('loginDialogEvent')
+        return
+      }
+
+      //2、判断认证状态
+      userInfoApi.getUserInfo().then(response => {
+        let authStatus = response.data.userInfo.authStatus
+        //如果未认证成功，跳转认证中心页面  /user/index.vue
+        if (authStatus !== 2) {
+          window.location.href = '/user'
+        } else {
+          //3、只有认证通过，接下来跳转到该科室的排班详情页面
+          window.location.href = '/hospital/schedule?hoscode=' + this.hospital.hoscode + "&depcode=" + depcode
+        }
+      })
     }
   }
 }
