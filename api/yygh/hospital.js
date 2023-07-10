@@ -43,4 +43,11 @@ export default {
       method: 'get'
     })
   },
+  //根据排班id查询
+  getSchedule(id) {
+    return request({
+      url: `${api_name}/getSchedule/${id}`,
+      method: 'get'
+    })
+  }
 }
