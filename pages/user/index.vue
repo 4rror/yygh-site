@@ -80,7 +80,7 @@
         </div>
         <div class="context-container" v-if="userInfo.authStatus != 0">
           <div>
-            <el-form :model="formData" label-width="110px" label-position="right">
+            <el-form :model="userInfo" label-width="110px" label-position="right">
               <el-form-item prop="name" label="姓名：" class="form-normal">
                 <div class="name-input">
                   {{ userInfo.name }}
