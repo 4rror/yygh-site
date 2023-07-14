@@ -117,6 +117,7 @@ import '~/assets/css/hospital_personal.css'
 import '~/assets/css/hospital.css'
 import orderInfoApi from '@/api/yygh/orderinfo'
 import patientApi from '@/api/yygh/patient'
+import cookie from "js-cookie";
 
 export default {
   data() {
@@ -131,6 +132,13 @@ export default {
     }
   },
   created() {
+  },
+  beforeMount() {
+    let token = cookie.get('token');
+    if (!token) {
+      window.location.href = '/'
+      return
+    }
     this.fetchData()
     this.findPatientList()
     this.getStatusList()

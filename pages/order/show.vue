@@ -106,8 +106,8 @@
         <div class="operate-view" style="height: 350px;">
           <div class="wrapper wechat">
             <div>
-              <img src="images/weixin.jpg" alt="">
-
+              <!-- 使用前端的qrious插件显示支付二维码；value属性：支付链接 -->
+              <qriously :value="payObj.codeUrl" :size="220"/>
               <div style="text-align: center;line-height: 25px;margin-bottom: 40px;">
                 请使用微信扫一扫<br/>
                 扫描二维码支付
@@ -124,6 +124,7 @@
 import '~/assets/css/hospital_personal.css'
 import '~/assets/css/hospital.css'
 import orderInfoApi from '@/api/yygh/orderinfo'
+import weixinApi from '@/api/yygh/wx'
 
 export default {
   data() {
@@ -147,6 +148,44 @@ export default {
         console.log(response.data);
         this.orderInfo = response.data.orderInfo
       })
+    },
+    //支付按钮绑定的方法
+    pay() {
+      weixinApi.queryPayStatus(this.orderId).then(response => {
+        if (response.data.message !== '支付成功') {
+          this.dialogPayVisible = true
+          weixinApi.createNative(this.orderId).then(response => {
+            this.payObj = response.data
+            if (this.payObj.codeUrl === '') {
+              this.dialogPayVisible = false
+              this.$message.error("支付错误")
+            } else {
+              //定时器，每隔3秒调用一次后端的查询支付状态接口
+              this.timer = setInterval(() => {
+                this.queryPayStatus(this.orderId)
+              }, 3000);
+            }
+          })
+        } else {
+          window.location.reload()
+        }
+      })
+    },
+    //查询订单的支付状态
+    queryPayStatus(orderId) {
+      weixinApi.queryPayStatus(orderId).then(response => {
+        if (response.message === '支付成功') {
+          //支付成功，关闭定时器，页面重新加载，显示订单信息
+          clearInterval(this.timer);
+          window.location.reload()
+        }
+      })
+    },
+    //关闭支付二维码
+    closeDialog() {
+      if (this.timer) {
+        clearInterval(this.timer);//关闭定时器
+      }
     }
   }
 }
