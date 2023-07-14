@@ -186,7 +186,25 @@ export default {
       if (this.timer) {
         clearInterval(this.timer);//关闭定时器
       }
-    }
+    },
+    cancelOrder() {
+      this.$confirm('确定取消预约吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        // 点击确定，远程调用
+        weixinApi.cancelOrder(this.orderId).then(resp => {
+          if (resp.code === 20000) {
+            this.$message.success('取消成功')
+            this.init() //重新加载当前页面的订单信息
+          } else {
+            //code!=20000
+            this.$message.error(resp.message)
+          }
+        })
+      })
+    },
   }
 }
 </script>

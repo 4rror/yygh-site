@@ -20,4 +20,10 @@ export default {
       method: 'get'
     })
   },
+  cancelOrder(orderId) {
+    return request({
+      url: `/api/order/orderInfo/auth/cancelOrder/${orderId}`,
+      method: 'get'
+    })
+  },
 }
